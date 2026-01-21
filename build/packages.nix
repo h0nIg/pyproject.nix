@@ -4,7 +4,7 @@
 }:
 let
   inherit (resolvers) resolveCyclic resolveNonCyclic;
-  inherit (lib) makeScope concatStringsSep;
+  inherit (lib) makeScope concatStringsSep unique;
 
   mkResolveBuildSystem =
     set:
@@ -69,6 +69,9 @@ let
               ++ map (pat: "--ignore-collisions ${pat}") finalAttrs.venvIgnoreCollisions
             );
           };
+
+          # expose the buildInputs - avoid "Argument list too long"
+          buildInputs = unique (pkgsFinal.resolveVirtualEnv spec);
         });
 
       hooks = pkgsFinal.callPackage ./hooks { };
